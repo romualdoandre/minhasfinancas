@@ -2,6 +2,7 @@ package com.romualdoandre.minhasfinancas.service;
 
 import java.util.Optional;
 
+import com.romualdoandre.minhasfinancas.exception.RegraNegocioException;
 import com.romualdoandre.minhasfinancas.model.entity.Usuario;
 
 public interface UsuarioService {
@@ -10,7 +11,7 @@ public interface UsuarioService {
 	
 	Usuario salvarUsuario(Usuario usuario);
 	
-	void validarEmail(String email);
+	void validarEmail(String email) throws RegraNegocioException;
 	
 	Optional<Usuario> obterPorId(Long id);
 	
