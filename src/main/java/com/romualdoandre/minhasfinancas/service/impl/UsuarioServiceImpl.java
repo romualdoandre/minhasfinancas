@@ -2,30 +2,58 @@ package com.romualdoandre.minhasfinancas.service.impl;
 
 import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.romualdoandre.minhasfinancas.exception.ErroAutenticacao;
 import com.romualdoandre.minhasfinancas.exception.RegraNegocioException;
 import com.romualdoandre.minhasfinancas.model.entity.Usuario;
 import com.romualdoandre.minhasfinancas.model.repository.UsuarioRepository;
 import com.romualdoandre.minhasfinancas.service.UsuarioService;
 
+@Service
 public class UsuarioServiceImpl implements UsuarioService{
 	
 	private UsuarioRepository repository;
+	private PasswordEncoder encoder;
 	
-	public UsuarioServiceImpl(UsuarioRepository repository) {
+	public UsuarioServiceImpl(UsuarioRepository repository,
+			PasswordEncoder encoder) {
 		super();
 		this.repository=repository;
+		this.encoder = encoder;
 	}
 
 	@Override
 	public Usuario autenticar(String email, String senha) {
-		// TODO Auto-generated method stub
-		return null;
+Optional<Usuario> usuario = repository.findByEmail(email);
+		
+		if(!usuario.isPresent()) {
+			throw new ErroAutenticacao("Usuário não encontrado para o email informado.");
+		}
+		
+		boolean senhasBatem = encoder.matches(senha, usuario.get().getSenha());
+		
+		if(!senhasBatem) {
+			throw new ErroAutenticacao("Senha inválida.");
+		}
+
+		return usuario.get();
 	}
 
 	@Override
+	@Transactional
 	public Usuario salvarUsuario(Usuario usuario) {
-		// TODO Auto-generated method stub
-		return null;
+		validarEmail(usuario.getEmail());
+		criptografarSenha(usuario);
+		return repository.save(usuario);
+	}
+	
+	private void criptografarSenha(Usuario usuario) {
+		String senha = usuario.getSenha();
+		String senhaCripto = encoder.encode(senha);
+		usuario.setSenha(senhaCripto);
 	}
 
 	@Override
@@ -37,8 +65,7 @@ public class UsuarioServiceImpl implements UsuarioService{
 
 	@Override
 	public Optional<Usuario> obterPorId(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		return repository.findById(id);
 	}
 
 }
