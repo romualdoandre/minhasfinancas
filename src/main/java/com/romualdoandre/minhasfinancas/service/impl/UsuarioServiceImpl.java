@@ -2,7 +2,6 @@ package com.romualdoandre.minhasfinancas.service.impl;
 
 import java.util.Optional;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,13 +15,12 @@ import com.romualdoandre.minhasfinancas.service.UsuarioService;
 public class UsuarioServiceImpl implements UsuarioService{
 	
 	private UsuarioRepository repository;
-	private PasswordEncoder encoder;
 	
-	public UsuarioServiceImpl(UsuarioRepository repository,
-			PasswordEncoder encoder) {
+	
+	public UsuarioServiceImpl(UsuarioRepository repository) {
 		super();
 		this.repository=repository;
-		this.encoder = encoder;
+		
 	}
 
 	@Override
@@ -33,7 +31,7 @@ Optional<Usuario> usuario = repository.findByEmail(email);
 			throw new ErroAutenticacao("Usuário não encontrado para o email informado.");
 		}
 		
-		boolean senhasBatem = encoder.matches(senha, usuario.get().getSenha());
+		boolean senhasBatem = senha.equals(usuario.get().getSenha());
 		
 		if(!senhasBatem) {
 			throw new ErroAutenticacao("Senha inválida.");
@@ -52,8 +50,8 @@ Optional<Usuario> usuario = repository.findByEmail(email);
 	
 	private void criptografarSenha(Usuario usuario) {
 		String senha = usuario.getSenha();
-		String senhaCripto = encoder.encode(senha);
-		usuario.setSenha(senhaCripto);
+		//String senhaCripto = encoder.encode(senha);
+		usuario.setSenha(senha);
 	}
 
 	@Override

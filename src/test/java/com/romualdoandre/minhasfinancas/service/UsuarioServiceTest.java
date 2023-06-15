@@ -9,7 +9,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -29,8 +28,9 @@ public class UsuarioServiceTest {
 	@MockBean
 	UsuarioRepository repository;
 	
-	@MockBean
-	PasswordEncoder encoder;
+	/*
+	 * @MockBean PasswordEncoder encoder;
+	 */
 	
 	@Test
 	public void deveSalvarUmUsuario() {
@@ -79,7 +79,7 @@ public class UsuarioServiceTest {
 		
 		Usuario usuario = Usuario.builder().email(email).senha(senha).id(1l).build();
 		Mockito.when( repository.findByEmail(email) ).thenReturn(Optional.of(usuario));
-		Mockito.when( encoder.matches(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+		//Mockito.when( encoder.matches(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
 		
 		//acao
 		Usuario result = service.autenticar(email, senha);
