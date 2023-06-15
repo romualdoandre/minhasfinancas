@@ -17,6 +17,7 @@ import com.romualdoandre.minhasfinancas.service.UsuarioService;
 import com.romualdoandre.minhasfinancas.model.entity.Usuario;
 import com.romualdoandre.minhasfinancas.exception.ErroAutenticacao;
 import com.romualdoandre.minhasfinancas.exception.RegraNegocioException;
+import com.romualdoandre.minhasfinancas.service.LancamentoService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class UsuarioResource {
 	
 	private final UsuarioService service;
+	private final LancamentoService lancamentoService;
 	@PostMapping
 	public ResponseEntity<?> salvar( @RequestBody UsuarioDTO dto ) {
 		
@@ -53,5 +55,17 @@ public class UsuarioResource {
 		}catch (ErroAutenticacao e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
+	}
+	
+	@GetMapping("{id}/saldo")
+	public ResponseEntity<?> obterSaldo( @PathVariable("id") Long id ) {
+		Optional<Usuario> usuario = service.obterPorId(id);
+		
+		if(!usuario.isPresent()) {
+			return new ResponseEntity<>( HttpStatus.NOT_FOUND );
+		}
+		
+		BigDecimal saldo = lancamentoService.obterSaldoPorUsuario(id);
+		return ResponseEntity.ok(saldo);
 	}
 }
