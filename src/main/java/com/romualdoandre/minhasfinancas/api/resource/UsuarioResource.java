@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.romualdoandre.minhasfinancas.api.dto.UsuarioDTO;
 import com.romualdoandre.minhasfinancas.service.UsuarioService;
 import com.romualdoandre.minhasfinancas.model.entity.Usuario;
+import com.romualdoandre.minhasfinancas.exception.ErroAutenticacao;
 import com.romualdoandre.minhasfinancas.exception.RegraNegocioException;
 
 import lombok.RequiredArgsConstructor;
@@ -40,5 +41,17 @@ public class UsuarioResource {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 		
+	}
+	
+	@PostMapping("/autenticar")
+	public ResponseEntity<?> autenticar( @RequestBody UsuarioDTO dto ) {
+		try {
+			Usuario usuarioAutenticado = service.autenticar(dto.getEmail(), dto.getSenha());
+			//String token = jwtService.gerarToken(usuarioAutenticado);
+			//TokenDTO tokenDTO = new TokenDTO( usuarioAutenticado.getNome(), token);
+			return ResponseEntity.ok(usuarioAutenticado);
+		}catch (ErroAutenticacao e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
 	}
 }
