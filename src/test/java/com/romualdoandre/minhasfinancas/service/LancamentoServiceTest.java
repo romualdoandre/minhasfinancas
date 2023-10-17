@@ -1,6 +1,7 @@
 package com.romualdoandre.minhasfinancas.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.romualdoandre.minhasfinancas.exception.RegraNegocioException;
 import com.romualdoandre.minhasfinancas.model.entity.Lancamento;
 import com.romualdoandre.minhasfinancas.model.enums.StatusLancamento;
 import com.romualdoandre.minhasfinancas.model.repository.LancamentoRepository;
@@ -40,7 +42,12 @@ class LancamentoServiceTest {
 	
 	@Test
 	public void naoDeveSalvarUmlancamentoQuandoHouverErroDeValidacao() {
+		Lancamento lancamentoASalvar = LancamentoRepositoryTest.criarLancamento();
+		Mockito.doThrow(RegraNegocioException.class).when(service).validar(lancamentoASalvar);
 		
+		catchThrowableOfType(()->service.salvar(lancamentoASalvar), RegraNegocioException.class);
+		
+		Mockito.verify(repository, Mockito.never()).save(lancamentoASalvar);
 	}
 
 }
