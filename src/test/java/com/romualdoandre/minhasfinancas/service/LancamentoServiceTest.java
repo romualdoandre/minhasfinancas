@@ -3,6 +3,10 @@ package com.romualdoandre.minhasfinancas.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
+import java.util.List;
+
+import org.assertj.core.util.Arrays;
+import org.hibernate.criterion.Example;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -65,10 +69,38 @@ class LancamentoServiceTest {
 	
 	@Test
 	public void deveLancarErroAoTentarAtualizarUmLancamentoQueAindaNaoFoiSalvo() {
-		Lancamento lancamentoASalvar = LancamentoRepositoryTest.criarLancamento();
+		Lancamento lancamento = LancamentoRepositoryTest.criarLancamento();
 		
-		catchThrowableOfType(()->service.atualizar(lancamentoASalvar), NullPointerException.class);
+		catchThrowableOfType(()->service.atualizar(lancamento), NullPointerException.class);
 		
-		Mockito.verify(repository, Mockito.never()).save(lancamentoASalvar);
+		Mockito.verify(repository, Mockito.never()).save(lancamento);
+	}
+	
+	@Test
+	public void deveDeletarUmLancamento() {
+		Lancamento lancamento = LancamentoRepositoryTest.criarLancamento();
+		lancamento.setId(1l);
+		
+		service.deletar(lancamento);
+		
+		Mockito.verify(repository).delete(lancamento);
+	}
+	
+	@Test
+	public void deveLancarErroAoTentarDeletarUmLancamentoQueAindaNaoFoiSalvo() {
+		Lancamento lancamento = LancamentoRepositoryTest.criarLancamento();
+		
+		catchThrowableOfType(()->service.deletar(lancamento), NullPointerException.class);
+		
+		Mockito.verify(repository, Mockito.never()).delete(lancamento);
+	}
+	
+	@Test
+	public void deveFiltrarLancamentos() {
+		//cenário
+		Lancamento lancamento = LancamentoRepositoryTest.criarLancamento();
+		lancamento.setId(1l);
+		List<Lancamento> lista = List.of(lancamento);
+		Mockito.when(repository.findAll()).thenReturn(lista);
 	}
 }
